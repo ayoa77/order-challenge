@@ -5,7 +5,6 @@ import { OrderDTO } from '../dtos/order.dto';
 import { Order } from '../types/order';
 import { LineItem } from '../types/line-item';
 import { Discount } from '../types/discount';
-import { LineItemDTO } from '../dtos/line-item.dto';
 
 @Injectable()
 export class OrderService {
@@ -170,7 +169,7 @@ export class OrderService {
     lineItemAmountHash,
   ): Promise<Order> {
     order.line_items.forEach(li => {
-      if (li.quantity == null) li.quantity = 1;
+      console.log(li);
       if (li.quantity == null) li.quantity = 1;
       li.discount = 0;
       li.discount += percentDiscount * li.price;
@@ -201,7 +200,6 @@ export class OrderService {
     );
 
     discountedOrder.tax_total = discountedOrder.line_items.reduce((acc, li) => {
-      if (li.price == null)
       return acc + (li.price - li.discount) * li.quantity * li.tax_rate;
     }, 0);
 

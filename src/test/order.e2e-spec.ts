@@ -3,18 +3,26 @@ import * as request from 'supertest';
 import { app, database } from './constants';
 import { createMockOrder, updateMockOrder } from './seeds/order.seed';
 import { totalsTester } from './test-helpers/test-order-calculations.helper';
+import { Model } from 'mongoose';
+import { Order } from '../types/order';
+import { OrderSchema } from '../models/order.schema';
+  
+  let db: mongoose.Connection;
+  let orderModel: Model<Order>;
 
-beforeAll(async () => {
-  await mongoose.connect(database, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  beforeAll(async () => {
+    db = await mongoose.createConnection(database, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db.dropDatabase();
+    orderModel = await db.model('Order', OrderSchema);
   });
-  await mongoose.connection.db.dropDatabase();
-});
 
-afterAll(async done => {
-  await mongoose.disconnect(done);
-});
+  afterAll(async done => {
+    await orderModel.deleteMany({});
+    await mongoose.disconnect(done);
+  });
 
 describe('/orders', () => {
   it('should create order of lineitems and calculate the taxes and totals', async () => {

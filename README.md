@@ -26,12 +26,13 @@ but I can only guarantee the following ->
 3. Install dependencies using `npm install`
 4. Add your own .env file with MONGO_URI, MONGO_URI_TEST, PORT, with your own variables
 5. Run a test server using `npm run start:test`
-6. Start your test using `npm run test`
-7. Start a development server `npm run start:dev`
-8. Navigate to app in [browser](http://localhost:8080) to get your hello world
-9. Use PostMan curl or any another preferred method to make the requests
+6. Start your unit tests using `npm run test`
+7. Start your end to end test using `npm run test:e2e`
+8. Start a development server `npm run start:dev`
+9. Navigate to app in [browser](http://localhost:8080) to get your hello world
+10. Use PostMan curl or any another preferred method to make the requests
    to http://localhost:8080/orders possible requests are [here](https://github.com/bypasslane/api-code-challenge/blob/master/orders_api.yaml)
-10. Enjoy!
+11. Enjoy!
 
 ## Discussion
 
@@ -63,13 +64,10 @@ more refactoring in the actual funcitons.
 - [x] Calculating Tax on an Order   
 - [x] Calculating the total of an Order
 
-Successfully made the orders calculate in the given order - from Order Discounts,
-to Line Item Discounts, and Taxes. 
+I successfully made the orders calculate the proper amounts in the given order - from Order Discounts, to Line Item Discounts, and Taxes. 
 
 I would however argue that it should be Percent Order Discounts, Line Item Discounts,
 Amount Order Discounts, and then Taxes. However, there was supporting evidence for
 both sides of this, so I went ahead and coded it out the way that the task asked.
 
-The yaml also doesn't contain some of the proper respsonse ie 404 for a get. These are 
-all working properly if your test suite needs to have these removed for some reason,
-let me know and I can do that rather quickly.
+The swagger yaml also doesn't contain some of the proper respsonse ie 404 for a get. These are  all working properly if your test suite needs to have these removed for some reason, let me know and I can do that rather quickly.
