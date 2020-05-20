@@ -71,3 +71,5 @@ Amount Order Discounts, and then Taxes. However, there was supporting evidence f
 both sides of this, so I went ahead and coded it out the way that the task asked.
 
 The swagger yaml also doesn't contain some of the proper respsonse ie 404 for a get. These are  all working properly if your test suite needs to have these removed for some reason, let me know and I can do that rather quickly.
+
+Most of the interesting stuff written can be found in src/order.service.ts, src/order.sevice.spec.ts, and src/test/order.e2e-spec.ts

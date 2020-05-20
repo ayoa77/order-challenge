@@ -169,7 +169,6 @@ export class OrderService {
     lineItemAmountHash,
   ): Promise<Order> {
     order.line_items.forEach(li => {
-      console.log(li);
       if (li.quantity == null) li.quantity = 1;
       li.discount = 0;
       li.discount += percentDiscount * li.price;
