@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
-import { setPrice } from '../helpers/set-price.helper';
+import { setPrice } from '../utils/helpers/set-price.helper';
 import { LineItemSchema } from './line-item.schema';
-import { DiscountSchema } from './discount.schema';;
+import { DiscountSchema } from './discount.schema';
 
 export const OrderSchema = new mongoose.Schema({
   uuid: {

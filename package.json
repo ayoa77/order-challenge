@@ -1,16 +1,16 @@
 {
   "name": "order-challenge",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "POS api with discounts and taxes",
+  "author": "Ayo Amadi",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:test": "NODE_ENV=test nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -21,13 +21,14 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/common": "^7.0.0",
-    "@nestjs/core": "^7.0.0",
+    "@nestjs/common": "^7.0.13",
+    "@nestjs/core": "^7.0.13",
     "@nestjs/mongoose": "^7.0.1",
     "@nestjs/platform-express": "^7.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.9.14",
+    "faker": "^4.1.0",
+    "mongoose": "^5.9.15",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4"

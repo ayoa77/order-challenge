@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { OrderDTO } from 'src/dtos/order.dto';
+import { OrderDTO } from '../dtos/order.dto';
 import { Order } from '../types/order';
 import { LineItem } from '../types/line-item';
 import { Discount } from '../types/discount';
@@ -23,7 +23,6 @@ export class OrderService {
       new this.orderModel(newOrder),
     );
     await createdOrder.save();
-
     return createdOrder;
   }
 
@@ -31,7 +30,7 @@ export class OrderService {
     const order = await this.orderModel.findOne({ uuid: orderUuid });
 
     if (!order) {
-      throw new HttpException('No Order with that uuid', HttpStatus.NO_CONTENT);
+      throw new HttpException('No Order with that uuid', HttpStatus.NOT_FOUND);
     }
     return order;
   }
@@ -46,82 +45,85 @@ export class OrderService {
     let updatedOrder = await this.orderModel.findOne({ uuid: orderUuid });
 
     if (!updatedOrder) {
-      throw new HttpException('No Order with that uuid', HttpStatus.NO_CONTENT);
+      throw new HttpException('No Order with that uuid', HttpStatus.NOT_FOUND);
     }
-    // console.log(payload);
+    payload.line_items.forEach(payloadLi => {
+      if( updatedOrder.line_items.filter((orderLi)=> payloadLi.uuid === orderLi) )
+    });
 
-    if (payload.line_items) {
+    if (payload.line_items != null && payload.line_items.length > 0) {
       updatedOrder.line_items.push(...payload.line_items);
     }
-    // updatedOrder.line_items.concat(payload.line_items);
-    // updatedOrder.markModified('line_items');
-    // }
-    if (payload.discounts) {
+    if (payload.discounts != null && payload.discounts.length > 0) {
       updatedOrder.discounts.push(...payload.discounts);
-      // updatedOrder.discounts.concat(payload.discounts);
-      // updatedOrder.markModified('discounts');
     }
 
     updatedOrder = await this.calculateOrderTotals(updatedOrder);
-    // updatedOrder = await this.calculateOrderTotals(
-    //   await this.pushLineItemsAndDiscountsOnToArray(updatedOrder, payload),
-    // );
 
     await updatedOrder.save();
     return updatedOrder;
   }
 
-  // async pushLineItemsAndDiscountsOnToArray(updatedOrder:Order, payload:any): Promise<Order> {
-
-  //   return updatedOrder;
-  // }
-
+  // These are helper functions for the calculations of tax_total and total
+  // They are written here so that they can be tested from order.spec.ts
   async parseDiscounts(order): Promise<any> {
-    // console.log('parseDiscounts', order);
-    const orderDiscounts: Discount[] = order.discounts.filter(
-      discount => discount.apply_to === order.uuid,
-    );
-    const lineItemDiscounts: Discount[] = order.discounts.filter(
-      discount => discount.apply_to !== order.uuid,
-    );
+    let orderDiscounts: Discount[];
+    let lineItemDiscounts: Discount[];
 
-    let percent = 0;
-    let amount = 0;
-
-    for (const orderDiscount of orderDiscounts) {
-      // console.log(orderDiscount);
-      if (orderDiscount.type === 'percent') percent += orderDiscount.amount;
-      else amount += orderDiscount.amount;
+    if (order.discounts && order.discounts.length > 0) {
+      orderDiscounts = order.discounts.filter(
+        discount => discount.apply_to === order.uuid,
+      );
+      lineItemDiscounts = order.discounts.filter(
+        discount => discount.apply_to !== order.uuid,
+      );
+    } else {
+      orderDiscounts = [];
+      lineItemDiscounts = [];
     }
+    let percentDiscount = 0;
+    let amountDiscount = 0;
 
-    let total = 0;
-    if (amount > 0) {
-      total = order.line_items.reduce((acc, cur: LineItem) => {
+    orderDiscounts.forEach(ordDisc => {
+      if (ordDisc.type === 'percent') percentDiscount += ordDisc.amount;
+      else amountDiscount += ordDisc.amount;
+    });
+
+    let tempTotal = 1;
+    if (amountDiscount > 0) {
+      tempTotal = order.line_items.reduce((acc, cur: LineItem) => {
         return acc + cur.quantity * cur.price;
       }, 0);
     }
 
     const lineItemPercentHash = {};
     const lineItemAmountHash = {};
-    for (const lineItemDiscount of lineItemDiscounts) {
-      const applyTo = lineItemDiscount.apply_to;
-      if (lineItemDiscount.type === 'percent' && lineItemPercentHash[applyTo])
-        lineItemPercentHash[applyTo] += lineItemDiscount.amount;
-      else if (lineItemDiscount.type === 'percent')
-        lineItemPercentHash[applyTo] = lineItemDiscount.amount;
-      else if (
-        lineItemDiscount.type === 'amount' &&
-        lineItemAmountHash[applyTo]
-      )
-        lineItemAmountHash[applyTo] += lineItemDiscount.amount;
-      else if (lineItemDiscount.type === 'amount')
-        lineItemAmountHash[applyTo] = lineItemDiscount.amount;
-    }
+
+    lineItemDiscounts.forEach(liDisc => {
+      const applyTo = liDisc.apply_to;
+      switch (true) {
+        case liDisc.type === 'percent' && lineItemPercentHash[applyTo]:
+          lineItemPercentHash[applyTo] += liDisc.amount;
+          break;
+        case liDisc.type === 'percent':
+          lineItemPercentHash[applyTo] = liDisc.amount;
+          break;
+        case liDisc.type === 'amount' && lineItemAmountHash[applyTo]:
+          lineItemAmountHash[applyTo] += liDisc.amount;
+          break;
+        case liDisc.type === 'amount':
+          lineItemAmountHash[applyTo] = liDisc.amount;
+          break;
+        default:
+          break;
+      }
+    });
+
     return {
       order,
-      percent,
-      amount,
-      total,
+      percentDiscount,
+      amountDiscount,
+      tempTotal,
       lineItemPercentHash,
       lineItemAmountHash,
     };
@@ -129,71 +131,49 @@ export class OrderService {
 
   async applyDiscounts(
     order,
-    percent,
-    amount,
-    total,
+    percentDiscount,
+    amountDiscount,
+    tempTotal,
     lineItemPercentHash,
     lineItemAmountHash,
   ): Promise<Order> {
-    for (let i = 0; i < order.line_items.length; i++) {
-      const lineItem = order.line_items[i];
-      lineItem.discount = 0;
-      lineItem.discount += percent * lineItem.price;
-      lineItem.discount +=
-        (amount * lineItem.price * lineItem.quantity) / total;
-      lineItem.discount +=
-        (lineItemPercentHash[lineItem.uuid] || 0) * lineItem.price;
-      lineItem.discount += lineItemAmountHash[lineItem.uuid] || 0;
-    }
+    order.line_items.forEach(li => {
+      if (li.quantity == null) li.quantity = 1;
+      li.discount = 0;
+      li.discount += percentDiscount * li.price;
+      li.discount += (amountDiscount * li.price * li.quantity) / tempTotal;
+      li.discount += (lineItemPercentHash[li.uuid] || 0) * li.price;
+      li.discount += lineItemAmountHash[li.uuid] || 0;
+    });
     return order;
   }
+
   async calculateOrderTotals(newOrder: Order): Promise<Order> {
-    console.log(newOrder);
     const {
       order,
-      percent,
-      amount,
-      total,
+      percentDiscount,
+      amountDiscount,
+      tempTotal,
       lineItemPercentHash,
       lineItemAmountHash,
     } = await this.parseDiscounts(newOrder);
 
-    console.log(percent, amount, lineItemAmountHash, lineItemPercentHash);
-
     const discountedOrder = await this.applyDiscounts(
       order,
-      percent,
-      amount,
-      total,
+      percentDiscount,
+      amountDiscount,
+      tempTotal,
       lineItemPercentHash,
       lineItemAmountHash,
     );
-    discountedOrder.tax_total = discountedOrder.line_items.reduce(
-      (acc, lineItem) => {
-        // console.log(
-        //   lineItem.price,
-        //   lineItem.discount,
-        //   lineItem.quantity,
-        //   lineItem.tax_rate,
-        //   acc
-        // );
-        // console.log(lineItem);
-        return (
-          acc +
-          (lineItem.price - lineItem.discount) *
-            lineItem.quantity *
-            lineItem.tax_rate
-        );
-      },
-      0,
-    );
-    // console.log(discountedOrder.tax_total)
-    discountedOrder.total = discountedOrder.line_items.reduce(
-      (acc, lineItem) => {
-        return acc + (lineItem.price - lineItem.discount) * lineItem.quantity;
-      },
-      discountedOrder.tax_total,
-    );
+
+    discountedOrder.tax_total = discountedOrder.line_items.reduce((acc, li) => {
+      return acc + (li.price - li.discount) * li.quantity * li.tax_rate;
+    }, 0);
+
+    discountedOrder.total = discountedOrder.line_items.reduce((acc, li) => {
+      return acc + (li.price - li.discount) * li.quantity;
+    }, discountedOrder.tax_total);
     return discountedOrder;
   }
 }

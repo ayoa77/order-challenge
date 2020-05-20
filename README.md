@@ -1,75 +1,70 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Order Challenge
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+By [Ayo Amadi](mailto:ayodeleamadi@gmail.com)
 
-## Description
+[ayo.works](https://ayo.works)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Publicly exposed api -
 
-## Installation
+[https://ayo.works/orders](https://ayo.works/orders)
 
-```bash
-$ npm install
-```
+## Prerequisites
 
-## Running the app
+Below is the tech used to Develop and Test this.
+It may not be necessary to use the same versions,
+when running this on your own service.
+but I can only guarantee the following ->
 
-```bash
-# development
-$ npm run start
+1. [Node v12](https://nodejs.org/en/)
+2. [MongoDB v4](https://www.mongodb.com/)
 
-# watch mode
-$ npm run start:dev
+## Instructions
 
-# production mode
-$ npm run start:prod
-```
+1. Navigate to [repo](https://github.com/ayoa77/order-challenge)
+2. Clone locally using
+   `git clone git@github.com:ayoa77/order-challenge.git`
+3. Install dependencies using `npm install`
+4. Add your own .env file with MONGO_URI, MONGO_URI_TEST, PORT, with your own variables
+5. Run a test server using `npm run start:test`
+6. Start your test using `npm run test`
+7. Start a development server `npm run start:dev`
+8. Navigate to app in [browser](http://localhost:8080) to get your hello world
+9. Use PostMan curl or any another preferred method to make the requests
+   to http://localhost:8080/orders possible requests are [here](https://github.com/bypasslane/api-code-challenge/blob/master/orders_api.yaml)
+10. Enjoy!
 
-## Test
+## Discussion
 
-```bash
-# unit tests
-$ npm run test
+I used the following technologies: Nest.JS(Node.JS, Express, TypeScript), Mongoose, Jest, and Supertest.
+I used [NEST CLI](https://docs.nestjs.com/cli/overview)
+to generate the scaffolding for this app. I also used this opportunity to improve my knowledge
+of TypeScript and Nest.JS as a framework. 
 
-# e2e tests
-$ npm run test:e2e
+I intended on using this time to improve on testing as well, but that did not go as well due to
+Nest.JS being rather young for a framework and lack of documentation for testing with mongoose. 
+After spending more time than I would have liked attempting to test the Nest way with 
+its compilation of a test module and then injection of a self-written mock, I decided to test 
+in a more straight forward way. I skipped the net way injected the actual orderModel. 
+I then created a connection to a test database and tested mockFunctions against the results
+from my actual functions. However, these mockFunctions could be more flexible and allow for 
+more refactoring in the actual funcitons. 
 
-# test coverage
-$ npm run test:cov
-```
+## Requirements
 
-## Support
+#### Build a simple POS system that accepts orders with line items, discounts, and taxes.
+#### [Order API Challenge](https://github.com/bypasslane/api-code-challenge)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Solar System Exploration, 1950s – 1960s
 
-## Stay in touch
+- [x] Creating an Order   POST /orders
+- [x] Adding a LineItem to an Order   PUT /orders/:uuid
+- [x] Adding a Discount to an Order   PUT /orders/:uuid
+- [x] Calculating Tax on an Order   GET /orders/:uuid
+- [x] Calculating the total of an Order
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Successfully made the orders calculate in the given order - from Order Discounts,
+to Line Item Discounts, and Taxes. 
 
-## License
-
-  Nest is [MIT licensed](LICENSE).
+I would however argue that it should be Percent Order Discounts, Line Item Discounts,
+Amount Order Discounts, and then Taxes. However, there was supporting evidence for
+both sides of this, so I went ahead and coded it out the way that the task asked.

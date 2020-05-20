@@ -10,6 +10,7 @@ export const DiscountSchema = new mongoose.Schema(
     name: String,
     type: {
       type: String,
+      enum: ['percent', 'amount'],
       required: [true, 'Name of the discount is required'],
     },
     amount: {

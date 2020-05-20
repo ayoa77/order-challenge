@@ -1,13 +1,22 @@
-import { Controller, Put, Param, Body, Post, Get } from '@nestjs/common';
+import {
+  Controller,
+  Put,
+  Param,
+  Body,
+  Post,
+  Get,
+  HttpCode,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
-import { Order } from 'src/types/order';
-import { OrderDTO } from 'src/dtos/order.dto';
+import { Order } from '../types/order';
+import { OrderDTO } from '../dtos/order.dto';
 
 @Controller('orders')
 export class OrderController {
   constructor(private orderService: OrderService) {}
 
   @Post()
+  @HttpCode(200)
   createOrder(@Body() order: OrderDTO): Promise<Order> {
     return this.orderService.createOrder(order);
   }
