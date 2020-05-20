@@ -72,12 +72,21 @@ describe('OrderService', () => {
         updateMockOrder.uuid,
         updateMockOrder,
       );
+
+      // making uniqe arrays of discounts and line items to see if these were
+      // successfully combined
+      const cmoDiscs = createMockOrder.discounts.map(cmoLi => cmoLi.uuid);
+      const umoDiscs = updateMockOrder.discounts.map(umoLi => umoLi.uuid);
+      const uniqueDiscsSize = new Set([...cmoDiscs, ...umoDiscs]).size;
+
+      const cmoLis = createMockOrder.line_items.map(cmoLi => cmoLi.uuid);
+      const umoLis = updateMockOrder.line_items.map(umoLi => umoLi.uuid);
+      const uniqueLisSize = new Set([...cmoLis, ...umoLis]).size;
       const { total, tax_total } = await totalsTester(result);
       expect(result.total).toBe(total);
       expect(result.tax_total).toBe(tax_total);
-      expect(result.line_items.length).toBe(
-        updateMockOrder.line_items.length + createMockOrder.line_items.length,
-      );
+      expect(result.discounts.length).toBe(uniqueDiscsSize);
+      expect(result.line_items.length).toBe(uniqueLisSize);
     });
   });
 

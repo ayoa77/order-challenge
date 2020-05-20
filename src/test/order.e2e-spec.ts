@@ -100,31 +100,21 @@ describe('/orders', () => {
       .set('Accept', 'application/json')
       .send(updateMockOrder)
       .expect(async ({ body }) => {
-        expect(body.line_items.length).toEqual(
-          createMockOrder.line_items.length + updateMockOrder.line_items.length,
-        );
-        expect(body.discounts.length).toEqual(
-          createMockOrder.discounts.length + updateMockOrder.discounts.length,
-        );
+        const cmoLis = createMockOrder.line_items.map(cmoLi => cmoLi.uuid);
+        const umoLis = updateMockOrder.line_items.map(umoLi => umoLi.uuid);
+        const uniqueLisSize = new Set([...cmoLis, ...umoLis]).size;
+        expect(body.line_items.length).toEqual(uniqueLisSize);
+        const cmoDiscs = createMockOrder.discounts.map(cmoLi => cmoLi.uuid);
+        const umoDiscs = updateMockOrder.discounts.map(umoLi => umoLi.uuid);
+        const uniqueDiscsSize = new Set([...cmoDiscs, ...umoDiscs]).size;
+        expect(body.discounts.length).toEqual(uniqueDiscsSize);
         expect(
           updateMockOrder.line_items
             .map(li => li.uuid)
-            .includes(
-              body.line_items[
-                createMockOrder.line_items.length +
-                  updateMockOrder.line_items.length -
-                  1
-              ].uuid,
-            ) ||
+            .includes(body.line_items[uniqueLisSize - 1].uuid) ||
             updateMockOrder.discounts
               .map(li => li.uuid)
-              .includes(
-                body.discounts[
-                  createMockOrder.discounts.length +
-                    updateMockOrder.discounts.length -
-                    1
-                ].uuid,
-              ),
+              .includes(body.discounts[uniqueDiscsSize - 1].uuid),
         ).toBeTruthy();
         const { tax_total, total } = await totalsTester(body);
         expect(body.tax_total).toEqual(tax_total);

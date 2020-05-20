@@ -5,6 +5,7 @@ import { OrderDTO } from '../dtos/order.dto';
 import { Order } from '../types/order';
 import { LineItem } from '../types/line-item';
 import { Discount } from '../types/discount';
+import { LineItemDTO } from '../dtos/line-item.dto';
 
 @Injectable()
 export class OrderService {
@@ -47,15 +48,46 @@ export class OrderService {
     if (!updatedOrder) {
       throw new HttpException('No Order with that uuid', HttpStatus.NOT_FOUND);
     }
-    payload.line_items.forEach(payloadLi => {
-      if( updatedOrder.line_items.filter((orderLi)=> payloadLi.uuid === orderLi) )
-    });
 
+    const payLoadLineItemsHash = {};
     if (payload.line_items != null && payload.line_items.length > 0) {
-      updatedOrder.line_items.push(...payload.line_items);
+      payload.line_items.forEach(li => {
+        payLoadLineItemsHash[li.uuid] = li;
+      });
+    } else payload.line_items = [];
+
+    if (payload.line_items.length > 0) {
+      updatedOrder.line_items.forEach(li => {
+        if (payLoadLineItemsHash[li.uuid]) {
+          li = payLoadLineItemsHash[li.uuid];
+          delete payLoadLineItemsHash[li.uuid];
+        }
+      });
     }
+
+    const payloadDiscountsHash = {};
     if (payload.discounts != null && payload.discounts.length > 0) {
-      updatedOrder.discounts.push(...payload.discounts);
+      payload.discounts.forEach(disc => {
+        payloadDiscountsHash[disc.uuid] = disc;
+      });
+    } else payload.discounts = [];
+
+    if (payload.discounts.length > 0) {
+      updatedOrder.discounts.forEach(disc => {
+        if (payloadDiscountsHash[disc.uuid]) {
+          disc = payloadDiscountsHash[disc.uuid];
+          delete payloadDiscountsHash[disc.uuid];
+        }
+      });
+    }
+
+    if (payload.line_items.length > 0) {
+      const newLineItems: LineItem[] = Object.values(payLoadLineItemsHash);
+      updatedOrder.line_items.push(...newLineItems);
+    }
+    if (payload.discounts.length > 0) {
+      const newDiscounts: Discount[] = Object.values(payloadDiscountsHash);
+      updatedOrder.discounts.push(...newDiscounts);
     }
 
     updatedOrder = await this.calculateOrderTotals(updatedOrder);
@@ -139,6 +171,7 @@ export class OrderService {
   ): Promise<Order> {
     order.line_items.forEach(li => {
       if (li.quantity == null) li.quantity = 1;
+      if (li.quantity == null) li.quantity = 1;
       li.discount = 0;
       li.discount += percentDiscount * li.price;
       li.discount += (amountDiscount * li.price * li.quantity) / tempTotal;
@@ -168,6 +201,7 @@ export class OrderService {
     );
 
     discountedOrder.tax_total = discountedOrder.line_items.reduce((acc, li) => {
+      if (li.price == null)
       return acc + (li.price - li.discount) * li.quantity * li.tax_rate;
     }, 0);
 

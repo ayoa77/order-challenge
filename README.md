@@ -22,7 +22,7 @@ but I can only guarantee the following ->
 
 1. Navigate to [repo](https://github.com/ayoa77/order-challenge)
 2. Clone locally using
-   `git clone git@github.com:ayoa77/order-challenge.git`
+   `git clone https://github.com/ayoa77/order-challenge.git`
 3. Install dependencies using `npm install`
 4. Add your own .env file with MONGO_URI, MONGO_URI_TEST, PORT, with your own variables
 5. Run a test server using `npm run start:test`
@@ -54,12 +54,13 @@ more refactoring in the actual funcitons.
 #### Build a simple POS system that accepts orders with line items, discounts, and taxes.
 #### [Order API Challenge](https://github.com/bypasslane/api-code-challenge)
 
-### Solar System Exploration, 1950s – 1960s
-
 - [x] Creating an Order   POST /orders
+- [x] Getting an Order   GET /orders/:uuid
 - [x] Adding a LineItem to an Order   PUT /orders/:uuid
 - [x] Adding a Discount to an Order   PUT /orders/:uuid
-- [x] Calculating Tax on an Order   GET /orders/:uuid
+- [x] Editing a LineItem for an Order   PUT /orders/:uuid
+- [x] Editing a Discount for an Order   PUT /orders/:uuid
+- [x] Calculating Tax on an Order   
 - [x] Calculating the total of an Order
 
 Successfully made the orders calculate in the given order - from Order Discounts,
@@ -68,3 +69,7 @@ to Line Item Discounts, and Taxes.
 I would however argue that it should be Percent Order Discounts, Line Item Discounts,
 Amount Order Discounts, and then Taxes. However, there was supporting evidence for
 both sides of this, so I went ahead and coded it out the way that the task asked.
+
+The yaml also doesn't contain some of the proper respsonse ie 404 for a get. These are 
+all working properly if your test suite needs to have these removed for some reason,
+let me know and I can do that rather quickly.
