@@ -1,18 +1,18 @@
 import 'dotenv/config';
-import { OrderService } from '../order.service';
+import { OrderService } from './order.service';
 import * as mongoose from 'mongoose';
-import { OrderSchema } from '../../models/order.schema';
+import { OrderSchema } from '../models/order.schema';
 import { Model } from 'mongoose';
 import {
   createMockOrder,
   updateMockOrder,
   initialMockOrder,
-} from '../../test/seeds/order.seed';
-import { Order } from '../../types/order';
+} from '../test/seeds/order.seed';
+import { Order } from '../types/order';
 import {
   totalsTester,
   testParseDiscounts,
-} from '../../test/test-helpers/test-order-calculations.helper';
+} from '../test/test-helpers/test-order-calculations.helper';
 
 describe('OrderService', () => {
   let orderService: OrderService;

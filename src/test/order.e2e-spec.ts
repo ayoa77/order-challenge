@@ -15,12 +15,13 @@ import { OrderSchema } from '../models/order.schema';
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    db.dropDatabase();
     orderModel = await db.model('Order', OrderSchema);
+    await orderModel.deleteMany({});
+    db.dropDatabase();
   });
 
   afterAll(async done => {
-    await orderModel.deleteMany({});
+
     await mongoose.disconnect(done);
   });
 
@@ -53,34 +54,35 @@ describe('/orders', () => {
         .post('/orders')
         .set('Accept', 'application/json')
         .send(createMockOrder)
-        // .expect(({ body }) => {
-        // })
         .expect(400)
     );
   });
+  
+  // commenting this test because this path is being used 
+  // to explain what the other endpoints are
 
-  it('should list all the orders', () => {
-    return request(app)
-      .get('/orders')
-      .expect(async ({ body }) => {
-        expect(body.length).toEqual(1);
-        expect(body[0].line_items.length).toEqual(
-          createMockOrder.line_items.length,
-        );
-        expect(body[0].discounts.length).toEqual(
-          createMockOrder.discounts.length,
-        );
-        expect(
-          createMockOrder.line_items
-            .map(li => li.uuid)
-            .includes(body[0].line_items[0].uuid),
-        ).toBeTruthy();
-        const { tax_total, total } = await totalsTester(body[0]);
-        expect(body[0].tax_total).toEqual(tax_total);
-        expect(body[0].total).toEqual(total);
-      })
-      .expect(200);
-  });
+  // it('should list all the orders', () => {
+  //   return request(app)
+  //     .get('/orders')
+  //     .expect(async ({ body }) => {
+  //       expect(body.length).toEqual(1);
+  //       expect(body[0].line_items.length).toEqual(
+  //         createMockOrder.line_items.length,
+  //       );
+  //       expect(body[0].discounts.length).toEqual(
+  //         createMockOrder.discounts.length,
+  //       );
+  //       expect(
+  //         createMockOrder.line_items
+  //           .map(li => li.uuid)
+  //           .includes(body[0].line_items[0].uuid),
+  //       ).toBeTruthy();
+  //       const { tax_total, total } = await totalsTester(body[0]);
+  //       expect(body[0].tax_total).toEqual(tax_total);
+  //       expect(body[0].total).toEqual(total);
+  //     })
+  //     .expect(200);
+  // });
 
   it('should fetch the order by the uuid', () => {
     return request(app)

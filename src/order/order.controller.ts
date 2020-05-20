@@ -32,17 +32,18 @@ export class OrderController {
     // over riding so that there is not only
     // [] being returned
     return {
-	"info": {
-		"title": "Ayo's Order Challenge API",
-		"description": "API challenge to build an order",
-		"version": "1.0"
-	},
-	"paths": {
-	    "POST":"/orders",
-	    "GET": "/orders/:uuid",
-	    "PUT": "/orders/:uuid"
-	}}
-
+      info: {
+        title: "Ayo's Order Challenge API",
+        description: 'API challenge to build an order',
+        version: '1.0',
+      },
+      paths: {
+        POST: '/orders',
+        GET: '/orders/:uuid',
+        PUT: '/orders/:uuid',
+      },
+    };
+  }
 
   @Put(':uuid')
   async update(
