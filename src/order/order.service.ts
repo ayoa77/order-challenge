@@ -22,6 +22,13 @@ export class OrderService {
     const createdOrder = await this.calculateOrderTotals(
       new this.orderModel(newOrder),
     );
+
+    if (createdOrder.total < 0){
+      throw new HttpException(
+        "Order total can't go below zero",
+        HttpStatus.BAD_REQUEST,
+      );
+    };
     await createdOrder.save();
     return createdOrder;
   }
@@ -51,14 +58,16 @@ export class OrderService {
     const payLoadLineItemsHash = {};
     if (payload.line_items != null && payload.line_items.length > 0) {
       payload.line_items.forEach(li => {
+        // if(!l)
         payLoadLineItemsHash[li.uuid] = li;
       });
     } else payload.line_items = [];
 
+
     if (payload.line_items.length > 0) {
-      updatedOrder.line_items.forEach(li => {
+      updatedOrder.line_items.forEach((li, ind) => {
         if (payLoadLineItemsHash[li.uuid]) {
-          li = payLoadLineItemsHash[li.uuid];
+          updatedOrder.line_items[ind] = payLoadLineItemsHash[li.uuid];
           delete payLoadLineItemsHash[li.uuid];
         }
       });
@@ -66,8 +75,8 @@ export class OrderService {
 
     const payloadDiscountsHash = {};
     if (payload.discounts != null && payload.discounts.length > 0) {
-      payload.discounts.forEach(disc => {
-        payloadDiscountsHash[disc.uuid] = disc;
+      payload.discounts.forEach((disc, ind) => {
+        updatedOrder.discounts[ind] = payloadDiscountsHash[disc.uuid] = disc;
       });
     } else payload.discounts = [];
 
@@ -79,7 +88,6 @@ export class OrderService {
         }
       });
     }
-
     if (payload.line_items.length > 0) {
       const newLineItems: LineItem[] = Object.values(payLoadLineItemsHash);
       updatedOrder.line_items.push(...newLineItems);
@@ -90,7 +98,12 @@ export class OrderService {
     }
 
     updatedOrder = await this.calculateOrderTotals(updatedOrder);
-
+    if (updatedOrder.total < 0){
+      throw new HttpException(
+        "Order total can't go below zero",
+        HttpStatus.BAD_REQUEST,
+      );
+    };
     await updatedOrder.save();
     return updatedOrder;
   }
@@ -123,6 +136,7 @@ export class OrderService {
     let tempTotal = 1;
     if (amountDiscount > 0) {
       tempTotal = order.line_items.reduce((acc, cur: LineItem) => {
+        if (!cur.quantity) cur.quantity = 1;
         return acc + cur.quantity * cur.price;
       }, 0);
     }
@@ -168,6 +182,7 @@ export class OrderService {
     lineItemPercentHash,
     lineItemAmountHash,
   ): Promise<Order> {
+
     order.line_items.forEach(li => {
       if (li.quantity == null) li.quantity = 1;
       li.discount = 0;
