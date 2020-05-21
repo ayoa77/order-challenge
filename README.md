@@ -11,8 +11,8 @@ Publicly exposed api -
 ## Prerequisites
 
 Below is the tech used to Develop and Test this.
-It may not be necessary to use the same versions,
-when running this on your own service.
+It may not be necessary to use the same versions
+when running this on your own server,
 but I can only guarantee the following ->
 
 1. [Node v12](https://nodejs.org/en/)
@@ -24,7 +24,7 @@ but I can only guarantee the following ->
 2. Clone locally using
    `git clone https://github.com/ayoa77/order-challenge.git`
 3. Install dependencies using `npm install`
-4. Add your own .env file with MONGO_URI, MONGO_URI_TEST, PORT, with your own variables
+4. Add your own .env file with MONGO_URI, MONGO_URI_TEST, PORT, exporting your own variables
 5. Run a test server using `npm run start:test`
 6. Start your unit tests using `npm run test`
 7. Start your end to end test using `npm run test:e2e`
@@ -42,10 +42,10 @@ to generate the scaffolding for this app. I also used this opportunity to improv
 of TypeScript and Nest.JS as a framework. 
 
 I intended on using this time to improve on testing as well, but that did not go as well due to
-Nest.JS being rather young for a framework and lack of documentation for testing with mongoose. 
+Nest.JS being a rather young framework and the lack of documentation for testing with mongoose. 
 After spending more time than I would have liked attempting to test the Nest way with 
 its compilation of a test module and then injection of a self-written mock, I decided to test 
-in a more straight forward way. I skipped the net way injected the actual orderModel. 
+in a more straight forward way. I skipped the Nest way and injected the actual orderModel. 
 I then created a connection to a test database and tested mockFunctions against the results
 from my actual functions. However, these mockFunctions could be more flexible and allow for 
 more refactoring in the actual funcitons. 
@@ -70,6 +70,6 @@ I would however argue that it should be Percent Order Discounts, Line Item Disco
 Amount Order Discounts, and then Taxes. However, there was supporting evidence for
 both sides of this, so I went ahead and coded it out the way that the task asked.
 
-The swagger yaml also doesn't contain some of the proper respsonse ie 404 for a get. These are  all working properly if your test suite needs to have these removed for some reason, let me know and I can do that rather quickly.
+The swagger yaml also doesn't contain some of the proper respsonse ie 404 for a "NOT FOUND" get request. These are  all working properly if your test suite needs to have these removed for some reason, let me know and I can do that rather quickly.
 
 Most of the interesting stuff written can be found in src/order.service.ts, src/order.sevice.spec.ts, and src/test/order.e2e-spec.ts
